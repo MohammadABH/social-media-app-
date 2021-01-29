@@ -20,5 +20,5 @@ mongoose
     .then((res) => {
         console.log(`Server running at ${res.url}`)
     }).catch(() => {
-        console.log('Error connecting to MongoDB')
+		console.log('Error connecting to MongoDB')
     });
