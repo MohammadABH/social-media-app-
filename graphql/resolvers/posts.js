@@ -35,8 +35,11 @@ module.exports = {
             // Get the token and decode it, and get the information from it
             // Make sure the user is authenticated 
             // Then create the post
-            const user = checkAuth(context);
-
+			const user = checkAuth(context);
+			
+			if(body.trim() === '') {
+				throw new Error('Post body must not be empty');
+			}
             // checkAuth throws errors if anything is invalid about the user, so user is now valid here
             const newPost = new Post({
                 body,
@@ -45,7 +48,11 @@ module.exports = {
                 createdAt: new Date().toISOString()
             });
 
-            const post = await newPost.save();
+			const post = await newPost.save();
+			
+			context.pubsub.publish('NEW_POST', {
+				newPost: post
+			});
 
             return post;
             
@@ -92,5 +99,10 @@ module.exports = {
 				throw new UserInputError('Post not found')
 			}
 		}
-    }
+	},
+	Subscription: {
+		newPost: {
+			subscribe: (_, __, { pubsub }) => pubsub.asyncIterator('NEW_POST')
+		}
+	}
 }
