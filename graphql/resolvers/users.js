@@ -20,6 +20,7 @@ const getToken = (user) => {
     { expiresIn: "1h" }
   );
 };
+
 module.exports = {
   Query: {
     async getUsers() {
@@ -53,7 +54,7 @@ module.exports = {
 
       // Handle duplicate username
       if (user) {
-        throw new UserInputError("Useername is taken", {
+        throw new UserInputError("Username is taken", {
           errors: {
             username: "This username is taken",
           },
@@ -74,7 +75,7 @@ module.exports = {
       const res = await newUser.save();
       // Return token to user
       const token = getToken(res);
-	  console.log(res._doc)
+
       return {
         ...res._doc,
         id: res._id,
@@ -85,11 +86,10 @@ module.exports = {
       const { errors, valid } = validateLoginInput(username, password);
 
       if (!valid) {
-        errors.general = "User not found";
         throw new UserInputError("Incorrect credentials", { errors });
       }
 
-      const user = User.findOne({ username });
+      const user = await User.findOne({ username });
 
       if (!user) {
         errors.general = "User not found";
@@ -109,6 +109,6 @@ module.exports = {
         id: user._id,
         token
       };
-    },
+    }
   },
 };
