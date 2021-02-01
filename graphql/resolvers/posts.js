@@ -70,6 +70,27 @@ module.exports = {
             } catch (err) {
                 throw new Error(err);
             }
-        }
+		},
+		async likePost(_, { postId }, context) {
+			const { username } = checkAuth(context);
+
+			const post = await Post.findById(postId);
+
+			if(post) {
+				const likeIndex = post.likes.findIndex(el => el.username === username);
+				if(likeIndex !== -1) {
+					post.likes.splice(likeIndex, 1);
+				} else {
+					post.likes.unshift({
+						username,
+						createdAt: new Date().toISOString()
+					});
+				}
+				await post.save();
+				return post;
+			} else {
+				throw new UserInputError('Post not found')
+			}
+		}
     }
 }
