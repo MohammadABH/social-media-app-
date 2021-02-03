@@ -1,49 +1,58 @@
-import React, { useState } from 'react';
-import { Button, Form } from 'semantic-ui-react';
-import { useMutation } from '@apollo/react-hooks';
-import gql from 'graphql-tag';
+import React, { useContext, useState } from "react";
+import { Button, Form } from "semantic-ui-react";
+import { useMutation } from "@apollo/react-hooks";
+import gql from "graphql-tag";
 
-const Register = () => {
+import { useForm } from "../util/hooks";
+import { AuthContext } from "../context/auth";
 
-	const [values, setValues] = useState({
-		username: '',
-		email: '',
-		password: '',
-		confirmPassword: ''
-	});
+const Register = (props) => {
+  const context = useContext(AuthContext);
 
-	const onChange = (e) => {
-		setValues({ ...values, [e.target.name]: e.target.value });
-	}
+  const [errors, setErrors] = useState({});
 
-	const [addUser, { loading }] = useMutation(REGISTER_USER, {
-		update(proxy, result) {
-			console.log(result); 
-		},
-		variables: values
-	})
+  const { onChange, onSubmit, values } = useForm(registerUser, {
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
 
-	const onSubmit = (e) => {
-		e.preventDefault();
-		addUser()
-	}
+  const [addUser, { loading }] = useMutation(REGISTER_USER, {
+    update(_, { data: { login: userData } }) {
+      context.login(userData);
+      props.history.push("/");
+    },
+    onError(err) {
+      setErrors(err.graphQLErrors[0].extensions.exception.errors);
+    },
+    variables: values,
+  });
 
-	return (
-    <div className='form-container'>
-      <Form onSubmit={onSubmit} noValidate>
+  function registerUser() {
+    addUser();
+  }
+
+  return (
+    <div className="form-container">
+      <Form onSubmit={onSubmit} noValidate className={loading ? "loading" : ""}>
         <h1>Register</h1>
         <Form.Input
           label="Username"
           placeholder="Username..."
-          name='username'
+          name="username"
+          type="text"
+          error={errors.username ? true : false}
           value={values.username}
           onChange={onChange}
         />
 
         <Form.Input
           label="Email"
-          placeholder="email..."
-          name='email'
+          placeholder="Email..."
+          name="email"
+          type="email"
+          error={errors.email ? true : false}
           value={values.email}
           onChange={onChange}
         />
@@ -51,7 +60,9 @@ const Register = () => {
         <Form.Input
           label="Password"
           placeholder="Password..."
-          name='password'
+          name="password"
+          type="password"
+          error={errors.password ? true : false}
           value={values.password}
           onChange={onChange}
         />
@@ -59,15 +70,26 @@ const Register = () => {
         <Form.Input
           label="Confirm Password"
           placeholder="Confirm Password..."
-          name='confirmPassword'
+          name="confirmPassword"
+          type="password"
+          error={errors.confirmPassword ? true : false}
           value={values.confirmPassword}
           onChange={onChange}
         />
 
-		<Button type='submit' primary >
-			Register
-		</Button>
+        <Button type="submit" primary>
+          Register
+        </Button>
       </Form>
+      {Object.keys(errors).length > 0 && (
+        <div className="ui error message">
+          <ul className="list">
+            {Object.values(errors).map((el) => (
+              <li key={el}>{el}</li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
