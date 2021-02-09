@@ -75,6 +75,7 @@ module.exports = {
       const res = await newUser.save();
       // Return token to user
       const token = getToken(res);
+      console.log(token);
 
       return {
         ...res._doc,
@@ -103,7 +104,7 @@ module.exports = {
 	  }
 	  
 	  const token = getToken(user);
-
+    console.log(token);
 	  return {
         ...user._doc,
         id: user._id,

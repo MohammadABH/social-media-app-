@@ -9,6 +9,7 @@ import AuthRoute from "./util/AuthRoute";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import Test from "./pages/Test";
 import NotFound from "./pages/NotFound";
 import Register from "./pages/Register";
 import MenuBar from "./components/MenuBar";
