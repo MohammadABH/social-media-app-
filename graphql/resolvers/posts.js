@@ -60,14 +60,10 @@ module.exports = {
         async deletePost(_, { postId }, context) {
             const user = checkAuth(context);
 
-            const post = await Post.findById(postId);
-
-            if(!post) {
-                throw new Error('Post does not exists!');
-            }
 
             try {
-                if(post.username === user.username) {
+                const post = await Post.findById(postId);
+                if(user.username === post.username) {
                     await post.delete();
                     return 'Post deleted successfully';
                 } else {
@@ -100,9 +96,9 @@ module.exports = {
 			}
 		}
 	},
-	Subscription: {
-		newPost: {
-			subscribe: (_, __, { pubsub }) => pubsub.asyncIterator('NEW_POST')
-		}
-	}
+    Subscription: {
+        newPost: {
+          subscribe: (_, __, { pubsub }) => pubsub.asyncIterator('NEW_POST')
+        }
+      }
 }

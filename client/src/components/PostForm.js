@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Button, Form } from "semantic-ui-react";
 import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
@@ -24,9 +24,6 @@ function PostForm(props) {
 		}
 	})
       values.body = "";
-	},
-	onError(err){
-		// Error handled below, this is just to prevent throwing errors
 	}
   });
 
@@ -39,7 +36,7 @@ function PostForm(props) {
         <h2>Create a Post:</h2>
         <Form.Field>
           <Form.Input
-            placeholder="Hi World"
+            placeholder="Create a Post!"
             name="body"
             onChange={onChange}
             value={values.body}
